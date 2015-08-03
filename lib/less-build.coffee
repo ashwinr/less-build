@@ -36,8 +36,14 @@ module.exports = LessBuild =
     buildOptions = atom.config.get('less-build')
     return unless buildOptions?
 
+    projectPath = atom.project.getPaths()[0]
+    unless projectPath?
+      projectPath = ""
+
     for src, dest of buildOptions
-      @renderLESS(src, dest)
+      srcPath = path.resolve(projectPath, src)
+      destPath = path.resolve(projectPath, dest)
+      @renderLESS(srcPath, destPath)
 
   renderLESS: (src, dest) ->
     text = fs.readFileSync src, {encoding: 'utf8'}
