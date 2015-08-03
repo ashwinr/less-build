@@ -1,33 +1,42 @@
-less = require 'less'
-LessBuildView = require './less-build-view'
+fs = require("fs")
+less = require("less")
+path = require("path")
 {CompositeDisposable} = require 'atom'
 
 module.exports = LessBuild =
-  lessBuildView: null
-  modalPanel: null
   subscriptions: null
+  options: {}
 
   activate: (state) ->
-    @lessBuildView = new LessBuildView(state.lessBuildViewState)
-    @modalPanel = atom.workspace.addModalPanel(item: @lessBuildView.getElement(), visible: false)
-
-    # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
-
     @subscriptions.add atom.commands.add 'atom-workspace', 'less-build:build': => @build()
 
   deactivate: ->
-    @modalPanel.destroy()
     @subscriptions.dispose()
-    @lessBuildView.destroy()
-
-  serialize: ->
-    lessBuildViewState: @lessBuildView.serialize()
 
   build: ->
-    console.log less
-
     editor = atom.workspace.getActiveTextEditor()
-    text = editor.getText()
-    console.log(text)
-    @modalPanel.show()
+    fileExtension = editor.getTitle().split(".")[1]
+    if fileExtension is 'less'
+      @buildLESS(editor)
+
+  buildLESS: (editor) ->
+    less.render editor.getText(), @options, (error, output) =>
+      if error isnt null
+          return @reportError(error, editor)
+
+      css = output.css
+      notifications = atom.notifications
+      fs.writeFile "/Users/a/1.css", css, {}, (error) ->
+        if error isnt null
+          notifications.addError('Unable to write to output file')
+        else
+          notifications.addSuccess('less-build: success')
+
+  reportError: (error, editor) ->
+      name = error.filename
+      if name == 'input'
+        name = editor.getTitle()
+
+      errorMessage = "#{name} [#{error.line}, #{error.column}]: #{error.message}"
+      atom.notifications.addError errorMessage, {}
