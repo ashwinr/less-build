@@ -1,0 +1,21 @@
+{
+  "name": "less-build",
+  "main": "./lib/less-build",
+  "version": "0.0.1",
+  "description": "LESS Builder",
+  "keywords": [
+      "less",
+      "build",
+      "builder"
+  ],
+  "activationCommands": {
+    "atom-workspace": "less-build:build"
+  },
+  "repository": "https://github.com/atom/less-build",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+  }
+}
