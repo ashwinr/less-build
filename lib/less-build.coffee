@@ -1,3 +1,4 @@
+less = require 'less'
 LessBuildView = require './less-build-view'
 {CompositeDisposable} = require 'atom'
 
@@ -24,9 +25,9 @@ module.exports = LessBuild =
     lessBuildViewState: @lessBuildView.serialize()
 
   build: ->
-    console.log 'less-build: build'
+    console.log less
 
-    if @modalPanel.isVisible()
-      @modalPanel.hide()
-    else
-      @modalPanel.show()
+    editor = atom.workspace.getActiveTextEditor()
+    text = editor.getText()
+    console.log(text)
+    @modalPanel.show()
