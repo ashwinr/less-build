@@ -1,12 +1,12 @@
 {
   "name": "less-build",
   "main": "./lib/less-build",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "LESS Builder",
   "keywords": [
-      "less",
-      "build",
-      "builder"
+    "less",
+    "build",
+    "builder"
   ],
   "repository": "https://github.com/ashwinr/less-build",
   "license": "MIT",
@@ -14,6 +14,6 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
-      "less": "~2.5.1"
+    "less": "~2.5.1"
   }
 }
