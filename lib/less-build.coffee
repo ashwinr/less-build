@@ -6,7 +6,6 @@ path = require("path")
 module.exports = LessBuild =
   lastActiveDisposable: null
   subscriptions: null
-  options: {}
 
   activate: (state) ->
     @subscriptions = new CompositeDisposable
@@ -14,39 +13,49 @@ module.exports = LessBuild =
 
     @onActivePanelChanged()
     atom.workspace.onDidChangeActivePaneItem (activePaneItem) =>
-      @lastActiveDisposable.dispose()
+      @lastActiveDisposable.dispose() if lastActiveDisposable?
       @onActivePanelChanged()
 
   deactivate: ->
     @subscriptions.dispose()
 
   onActivePanelChanged: ->
-    @lastActiveDisposable = atom.workspace.getActiveTextEditor().onDidSave () =>
+    editor = atom.workspace.getActiveTextEditor()
+    return unless editor?
+
+    @lastActiveDisposable = editor.onDidSave () =>
       @build()
 
   build: ->
     editor = atom.workspace.getActiveTextEditor()
     fileExtension = editor.getTitle().split(".")[1]
     if fileExtension is 'less'
-      @buildLESS(editor)
+      @buildLESS()
 
-  buildLESS: (editor) ->
-    less.render editor.getText(), @options, (error, output) =>
+  buildLESS: () ->
+    buildOptions = atom.config.get('less-build')
+    return unless buildOptions?
+
+    for src, dest of buildOptions
+      @renderLESS(src, dest)
+
+  renderLESS: (src, dest) ->
+    text = fs.readFileSync src, {encoding: 'utf8'}
+    lessOptions =
+      paths: [path.dirname path.resolve(src)]
+      filename: path.basename src
+
+    less.render text, lessOptions, (error, output) =>
       if error isnt null
-          return @reportError(error, editor)
+        return @reportError(error)
 
       css = output.css
-      notifications = atom.notifications
-      fs.writeFile "/Users/aramaswamy/1.css", css, {}, (error) ->
+      fs.writeFile dest, css, {}, (error) ->
         if error isnt null
-          notifications.addError('Unable to write to output file')
+          atom.notifications.addError('Unable to write to output file')
         else
-          notifications.addSuccess('less-build: success')
+          atom.notifications.addSuccess('less-build: success')
 
-  reportError: (error, editor) ->
-      name = error.filename
-      if name == 'input'
-        name = editor.getTitle()
-
-      errorMessage = "#{name} [#{error.line}, #{error.column}]: #{error.message}"
-      atom.notifications.addError errorMessage, {}
+  reportError: (error) ->
+    errorMessage = "#{error.filename} [#{error.line}, #{error.column}]: #{error.message}"
+    atom.notifications.addError errorMessage, {}
