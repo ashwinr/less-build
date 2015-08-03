@@ -1,7 +1,7 @@
 {
   "name": "less-build",
   "main": "./lib/less-build",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "LESS Builder",
   "keywords": [
       "less",
