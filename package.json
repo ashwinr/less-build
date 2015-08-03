@@ -8,9 +8,6 @@
       "build",
       "builder"
   ],
-  "activationCommands": {
-    "atom-workspace": "less-build:build"
-  },
   "repository": "https://github.com/atom/less-build",
   "license": "MIT",
   "engines": {

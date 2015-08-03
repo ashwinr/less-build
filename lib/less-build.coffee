@@ -4,6 +4,7 @@ path = require("path")
 {CompositeDisposable} = require 'atom'
 
 module.exports = LessBuild =
+  lastActiveDisposable: null
   subscriptions: null
   options: {}
 
@@ -11,8 +12,17 @@ module.exports = LessBuild =
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.commands.add 'atom-workspace', 'less-build:build': => @build()
 
+    @onActivePanelChanged()
+    atom.workspace.onDidChangeActivePaneItem (activePaneItem) =>
+      @lastActiveDisposable.dispose()
+      @onActivePanelChanged()
+
   deactivate: ->
     @subscriptions.dispose()
+
+  onActivePanelChanged: ->
+    @lastActiveDisposable = atom.workspace.getActiveTextEditor().onDidSave () =>
+      @build()
 
   build: ->
     editor = atom.workspace.getActiveTextEditor()
@@ -27,7 +37,7 @@ module.exports = LessBuild =
 
       css = output.css
       notifications = atom.notifications
-      fs.writeFile "/Users/a/1.css", css, {}, (error) ->
+      fs.writeFile "/Users/aramaswamy/1.css", css, {}, (error) ->
         if error isnt null
           notifications.addError('Unable to write to output file')
         else
