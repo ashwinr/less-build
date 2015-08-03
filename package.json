@@ -8,7 +8,7 @@
       "build",
       "builder"
   ],
-  "repository": "https://github.com/atom/less-build",
+  "repository": "https://github.com/ashwinr/less-build",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
