@@ -17,6 +17,7 @@ module.exports = LessBuild =
       @onActivePanelChanged()
 
   deactivate: ->
+    @lastActiveDisposable.dispose() if lastActiveDisposable?
     @subscriptions.dispose()
 
   onActivePanelChanged: ->
@@ -33,12 +34,15 @@ module.exports = LessBuild =
       @buildLESS()
 
   buildLESS: () ->
-    buildOptions = atom.config.get('less-build')
-    return unless buildOptions?
-
+    projectName = atom.config.get('less-build.project')
     projectPath = atom.project.getPaths()[0]
     unless projectPath?
       projectPath = ""
+
+    return if projectPath.slice(-projectName.length) isnt projectName
+
+    buildOptions = atom.config.get('less-build.options')
+    return unless buildOptions?
 
     for src, dest of buildOptions
       srcPath = path.resolve(projectPath, src)
